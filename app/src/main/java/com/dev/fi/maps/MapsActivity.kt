@@ -8,6 +8,11 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.orhanobut.logger.Logger
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
+
+
 
 
 class MapsActivity : AppCompatActivity(),
@@ -16,19 +21,27 @@ class MapsActivity : AppCompatActivity(),
         GoogleMap.OnPolygonClickListener,
         MapsView{
 
-    override fun onProcess() {
+    val  listLatLng = mutableListOf<LatLng>()
 
+    override fun onProcess() {
+        //do process
     }
 
-    override fun getResult(response: RoutesResponse) {
+    override fun getResult(response: ResponseModel.RoutesResponse) {
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
+        for (i in 0 ..(response.routes?.get(0)?.legs?.get(0)?.steps?.size!! - 1)){
+            var lag = response.routes?.get(0)?.legs?.get(0)?.steps?.get(i)?.start_location?.lng!!
+            var lat = response.routes?.get(0)?.legs?.get(0)?.steps?.get(i)?.start_location?.lat!!
+            listLatLng.add(LatLng(lat, lag))
+        }
+
         mapFragment.getMapAsync(this)
     }
 
     override fun getError(string: String?) {
-
+        // do error
     }
 
     private lateinit var presenter: MapsPresenter
@@ -75,24 +88,52 @@ class MapsActivity : AppCompatActivity(),
         // Add polylines and polygons to the map. This section shows just
         // a single polyline. Read the rest of the tutorial to learn more.
 
-        //TODO: get longlat from json response
 
         val polyline1 = googleMap.addPolyline(PolylineOptions()
                 .clickable(true)
-                .add(
-                        LatLng(-35.016, 143.321),
-                        LatLng(-34.747, 145.592),
-                        LatLng(-34.364, 147.891),
-                        LatLng(-33.501, 150.217),
-                        LatLng(-32.306, 149.248),
-                        LatLng(-32.491, 147.309)))
+                .addAll(listLatLng))
 
         // Position the map's camera near Alice Springs in the center of Australia,
         // and set the zoom factor so most of Australia shows on the screen.
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(-23.684, 133.903), 4f))
+
+        val builder = setMapCamera(polyline1)
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder?.build(), 48))
 
         // Set listeners for click events.
         googleMap.setOnPolylineClickListener(this)
         googleMap.setOnPolygonClickListener(this)
+    }
+
+    private fun setMapCamera(polyline: Polyline): LatLngBounds.Builder? {
+        var hasPoints = false
+        var maxLat: Double? = null
+        var minLat: Double? = null
+        var minLon: Double? = null
+        var maxLon: Double? = null
+
+        if (polyline?.points != null) {
+            val pts = polyline.points
+            for (coordinate in pts) {
+                // Find out the maximum and minimum latitudes & longitudes
+                // Latitude
+                maxLat = if (maxLat != null) Math.max(coordinate.latitude, maxLat) else coordinate.latitude
+                minLat = if (minLat != null) Math.min(coordinate.latitude, minLat) else coordinate.latitude
+
+                // Longitude
+                maxLon = if (maxLon != null) Math.max(coordinate.longitude, maxLon) else coordinate.longitude
+                minLon = if (minLon != null) Math.min(coordinate.longitude, minLon) else coordinate.longitude
+
+                hasPoints = true
+            }
+        }
+
+        return if (hasPoints) {
+            val builder = LatLngBounds.Builder()
+            builder.include(LatLng(maxLat!!, maxLon!!))
+            builder.include(LatLng(minLat!!, minLon!!))
+            builder
+        }else{
+            null
+        }
     }
 }

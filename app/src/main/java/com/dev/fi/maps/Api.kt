@@ -13,6 +13,6 @@ created by -manca-
  */
 
 interface Api {
-    @GET("")
-    fun getRoutes(@QueryMap headers: LinkedHashMap<String, String?>): Observable<Response<RoutesResponse>>
+    @GET("json")
+    fun getRoutes(@QueryMap headers: LinkedHashMap<String, String?>): Observable<Response<ResponseModel.RoutesResponse>>
 }

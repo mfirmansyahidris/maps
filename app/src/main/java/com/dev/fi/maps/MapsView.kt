@@ -9,6 +9,6 @@ created by -manca-
 
 interface MapsView{
     fun onProcess()
-    fun getResult(response: RoutesResponse)
+    fun getResult(response: ResponseModel.RoutesResponse)
     fun getError(string: String?)
 }

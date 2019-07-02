@@ -36,7 +36,7 @@ object RetrofitBuilder {
                 .addConverterFactory(MoshiConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .client(okHttpClient())
-                .baseUrl("https://maps.googleapis.com/maps/api/directions/json?")
+                .baseUrl("https://maps.googleapis.com/maps/api/directions/")
                 .build()
         return retrofit.create(Api::class.java)
     }
