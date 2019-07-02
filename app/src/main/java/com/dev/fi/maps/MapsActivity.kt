@@ -1,27 +1,21 @@
 package com.dev.fi.maps
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
-import com.orhanobut.logger.Logger
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
-
-
 
 
 class MapsActivity : AppCompatActivity(),
         OnMapReadyCallback,
         GoogleMap.OnPolylineClickListener,
         GoogleMap.OnPolygonClickListener,
-        MapsView{
+        MapsView {
 
-    val  listLatLng = mutableListOf<LatLng>()
+    private val listLatLng = mutableListOf<LatLng>()
 
     override fun onProcess() {
         //do process
@@ -31,9 +25,9 @@ class MapsActivity : AppCompatActivity(),
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
-        for (i in 0 ..(response.routes?.get(0)?.legs?.get(0)?.steps?.size!! - 1)){
-            var lag = response.routes?.get(0)?.legs?.get(0)?.steps?.get(i)?.start_location?.lng!!
-            var lat = response.routes?.get(0)?.legs?.get(0)?.steps?.get(i)?.start_location?.lat!!
+        for (i in 0 until response.routes?.get(0)?.legs?.get(0)?.steps?.size!!) {
+            val lag = response.routes?.get(0)?.legs?.get(0)?.steps?.get(i)?.start_location?.lng!!
+            val lat = response.routes?.get(0)?.legs?.get(0)?.steps?.get(i)?.start_location?.lat!!
             listLatLng.add(LatLng(lat, lag))
         }
 
@@ -58,7 +52,7 @@ class MapsActivity : AppCompatActivity(),
 
         presenter = MapsPresenter(this)
 
-        var hashmap = LinkedHashMap<String, String?>()
+        val hashmap = LinkedHashMap<String, String?>()
         hashmap["origin"] = "-5.102606,119.528874"
         hashmap["destination"] = "-5.171547,119.432462"
         hashmap["avoid"] = "highways"
@@ -68,33 +62,11 @@ class MapsActivity : AppCompatActivity(),
         presenter.getRoutes(hashmap)
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     override fun onMapReady(googleMap: GoogleMap) {
-        /*mMap = googleMap
-
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))*/
-
-        // Add polylines and polygons to the map. This section shows just
-        // a single polyline. Read the rest of the tutorial to learn more.
-
 
         val polyline1 = googleMap.addPolyline(PolylineOptions()
                 .clickable(true)
                 .addAll(listLatLng))
-
-        // Position the map's camera near Alice Springs in the center of Australia,
-        // and set the zoom factor so most of Australia shows on the screen.
 
         val builder = setMapCamera(polyline1)
         googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder?.build(), 48))
@@ -111,7 +83,7 @@ class MapsActivity : AppCompatActivity(),
         var minLon: Double? = null
         var maxLon: Double? = null
 
-        if (polyline?.points != null) {
+        if (polyline.points != null) {
             val pts = polyline.points
             for (coordinate in pts) {
                 // Find out the maximum and minimum latitudes & longitudes
@@ -132,7 +104,7 @@ class MapsActivity : AppCompatActivity(),
             builder.include(LatLng(maxLat!!, maxLon!!))
             builder.include(LatLng(minLat!!, minLon!!))
             builder
-        }else{
+        } else {
             null
         }
     }
