@@ -25,7 +25,7 @@ data class GeoJson(
 	data class Properties(
 			val NAME: String? = null,
 			val BRANCH: String? = null,
-			val WARNA: String? = null,
+			val warna: String? = null,
 			val KABUPATEN: String? = null,
 			val SUBS: Double? = null,
 			val LONGITUDE: Double? = null,
