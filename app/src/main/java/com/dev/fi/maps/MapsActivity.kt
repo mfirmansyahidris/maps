@@ -10,6 +10,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.data.geojson.GeoJsonLayer
+import com.google.maps.android.data.geojson.GeoJsonPolygonStyle
 import com.orhanobut.logger.Logger
 import org.json.JSONArray
 import org.json.JSONObject
@@ -73,30 +74,15 @@ class MapsActivity : AppCompatActivity(),
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        Logger.d(geoJson.features!!.size)
-        //for (i in 0 until geoJson.features!!.size){
-        for (i in 0 until 10){
-            val coordinates = mutableListOf<LatLng>()
-            //var print = ""
-            for (j in 0 until geoJson.features!![i]?.geometry?.coordinates?.get(0)!!.size){
-                //print += ".add(LatLng(${geoJson.features!![i]?.geometry?.coordinates?.get(0)?.get(j)?.get(0)!!}, ${geoJson.features!![i]?.geometry?.coordinates?.get(0)?.get(j)?.get(1)!!} )) "
-                Logger.d("${geoJson.features!![i]?.geometry?.coordinates?.get(0)?.get(j)?.get(1)!!} , ${geoJson.features!![i]?.geometry?.coordinates?.get(0)?.get(j)?.get(0)!!}")
-                coordinates.add(LatLng(
-                        geoJson.features!![i]?.geometry?.coordinates?.get(0)?.get(j)?.get(1)!!,
-                        geoJson.features!![i]?.geometry?.coordinates?.get(0)?.get(j)?.get(0)!!))
-            }
+        val geoJson = GeoJsonLayer(googleMap, R.raw.pamasuka_subs, this)
+        val polygonStyle = geoJson.defaultPolygonStyle
+        polygonStyle.fillColor = Color.RED
 
-            //Logger.d(print)
-            Logger.d(coordinates)
-            Logger.d(geoJson.features!![i]?.properties?.warna)
-            Logger.d(geoJson.features!![i]?.properties?.KABUPATEN)
 
-            googleMap.addPolygon(PolygonOptions()
-                    .addAll(coordinates)
-                    .fillColor(Color.parseColor(geoJson.features!![0]?.properties?.warna))
-                    .strokeWidth((3).toFloat())
-                    .strokeColor(Color.RED))
+        geoJson.addLayerToMap()
+
+        geoJson.setOnFeatureClickListener{
+            Logger.d(it)
         }
-
     }
 }
